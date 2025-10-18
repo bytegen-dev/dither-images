@@ -794,7 +794,7 @@ export default function DitherImageApp() {
                       className="border-white/20 text-white hover:bg-white/10"
                     >
                       <Code className="w-4 h-4 mr-2" />
-                      View SVG Code
+                      SVG code
                     </Button>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
