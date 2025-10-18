@@ -1,6 +1,6 @@
 # Image Dithering App
 
-<img width="1253" height="1239" alt="image" src="https://github.com/user-attachments/assets/74d6da00-2dac-4ccb-a2d7-317da146a1cc" />
+<img width="1300" height="1246" alt="image" src="https://github.com/user-attachments/assets/63196c78-2416-4a43-af7b-d2fc59625149" />
 
 A basic web app that converts images into black-and-white dotted patterns using dithering algorithms.
 
