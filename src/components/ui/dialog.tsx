@@ -5,6 +5,7 @@ import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { textAlign } from "html2canvas/dist/types/css/property-descriptors/text-align";
 
 const Dialog = DialogPrimitive.Root;
 
@@ -102,8 +103,12 @@ const DialogDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Description
     ref={ref}
-    className={cn("text-sm text-muted-foreground", className)}
+    className={cn("text-sm text-white/40", className)}
     {...props}
+    style={{
+      textAlign: "left",
+      color: "#aaa",
+    }}
   />
 ));
 DialogDescription.displayName = DialogPrimitive.Description.displayName;
