@@ -13,6 +13,8 @@ import {
   Copy,
   ChevronDown,
   FileIcon,
+  Code,
+  Check,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -35,6 +37,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import Cropper from "react-easy-crop";
+import Editor from "@monaco-editor/react";
 
 const minGridSize = 64;
 const defaultGridSize = 200;
@@ -50,6 +53,9 @@ export default function DitherImageApp() {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+  const [showSvgCodeDialog, setShowSvgCodeDialog] = useState(false);
+  const [svgCode, setSvgCode] = useState("");
+  const [isCopied, setIsCopied] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const cropCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -551,8 +557,26 @@ export default function DitherImageApp() {
     try {
       const svgData = new XMLSerializer().serializeToString(svgRef.current);
       await navigator.clipboard.writeText(svgData);
+
+      // Show checkmark feedback
+      setIsCopied(true);
+      setTimeout(() => {
+        setIsCopied(false);
+      }, 1000);
     } catch (error) {
       console.error("SVG copy failed:", error);
+    }
+  }, []);
+
+  const handleViewSvgCode = useCallback(() => {
+    if (!svgRef.current) return;
+
+    try {
+      const svgData = new XMLSerializer().serializeToString(svgRef.current);
+      setSvgCode(svgData);
+      setShowSvgCodeDialog(true);
+    } catch (error) {
+      console.error("Failed to get SVG code:", error);
     }
   }, []);
 
@@ -725,49 +749,61 @@ export default function DitherImageApp() {
             <Card className="p-4 border-border">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-medium">Dithered</h3>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      disabled={isProcessing}
-                      size="sm"
-                      className="bg-white text-black hover:bg-gray-100"
-                    >
-                      Export
-                      <ChevronDown className="w-4 h-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="bg-black border-white/20">
-                    <DropdownMenuItem
-                      onClick={handleExportPNG}
-                      className="text-white hover:bg-white/10 cursor-pointer"
-                    >
-                      <ImageIcon className="w-4 h-4" />
-                      Download as PNG
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={handleExportSVG}
-                      className="text-white hover:bg-white/10 cursor-pointer"
-                    >
-                      <FileIcon className="w-4 h-4" />
-                      Download as SVG
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator className="bg-white/20" />
-                    <DropdownMenuItem
-                      onClick={handleCopyPNG}
-                      className="text-white hover:bg-white/10 cursor-pointer"
-                    >
-                      <Copy className="w-4 h-4" />
-                      Copy as PNG
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={handleCopySVG}
-                      className="text-white hover:bg-white/10 cursor-pointer"
-                    >
-                      <Copy className="w-4 h-4" />
-                      Copy as SVG
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <div className="flex items-center space-x-2">
+                  <Button
+                    onClick={handleViewSvgCode}
+                    disabled={isProcessing}
+                    size="sm"
+                    variant="outline"
+                    className="border-white/20 text-white hover:bg-white/10"
+                  >
+                    <Code className="w-4 h-4 mr-2" />
+                    View SVG Code
+                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        disabled={isProcessing}
+                        size="sm"
+                        className="bg-white text-black hover:bg-gray-100"
+                      >
+                        Export
+                        <ChevronDown className="w-4 h-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="bg-black border-white/20">
+                      <DropdownMenuItem
+                        onClick={handleExportPNG}
+                        className="text-white hover:bg-white/10 cursor-pointer"
+                      >
+                        <ImageIcon className="w-4 h-4" />
+                        Download as PNG
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={handleExportSVG}
+                        className="text-white hover:bg-white/10 cursor-pointer"
+                      >
+                        <FileIcon className="w-4 h-4" />
+                        Download as SVG
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator className="bg-white/20" />
+                      <DropdownMenuItem
+                        onClick={handleCopyPNG}
+                        className="text-white hover:bg-white/10 cursor-pointer"
+                      >
+                        <Copy className="w-4 h-4" />
+                        Copy as PNG
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={handleCopySVG}
+                        className="text-white hover:bg-white/10 cursor-pointer"
+                      >
+                        <Copy className="w-4 h-4" />
+                        Copy as SVG
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
               </div>
               <div className="aspect-square bg-white rounded-lg overflow-hidden relative flex items-center justify-center">
                 {isProcessing ? (
@@ -872,6 +908,64 @@ export default function DitherImageApp() {
                 >
                   <Crop className="w-4 h-4 mr-2" />
                   Crop & Continue
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* SVG Code Dialog */}
+        <Dialog open={showSvgCodeDialog} onOpenChange={setShowSvgCodeDialog}>
+          <DialogContent className="max-w-4xl bg-black border-white/20">
+            <DialogHeader>
+              <DialogTitle className="flex items-center space-x-2 text-white">
+                <Code className="w-5 h-5" />
+                <span>SVG Code</span>
+              </DialogTitle>
+              <DialogDescription className="text-muted-foreground">
+                View and copy the generated SVG code for your dithered image.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-4">
+              <div className="h-96 border border-white/20 rounded-lg overflow-hidden">
+                <Editor
+                  height="100%"
+                  defaultLanguage="xml"
+                  value={svgCode}
+                  theme="vs-dark"
+                  options={{
+                    readOnly: true,
+                    minimap: { enabled: false },
+                    scrollBeyondLastLine: false,
+                    wordWrap: "on",
+                    fontSize: 14,
+                    lineNumbers: "on",
+                    folding: true,
+                    lineDecorationsWidth: 0,
+                    lineNumbersMinChars: 3,
+                  }}
+                />
+              </div>
+
+              <div className="flex justify-end space-x-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowSvgCodeDialog(false)}
+                  className="border-white/20 text-white hover:bg-white/10"
+                >
+                  Close
+                </Button>
+                <Button
+                  onClick={handleCopySVG}
+                  className="bg-white text-black hover:bg-gray-100"
+                >
+                  {isCopied ? (
+                    <Check className="w-4 h-4 mr-2" />
+                  ) : (
+                    <Copy className="w-4 h-4 mr-2" />
+                  )}
+                  {isCopied ? "Copied!" : "Copy SVG Code"}
                 </Button>
               </div>
             </div>
