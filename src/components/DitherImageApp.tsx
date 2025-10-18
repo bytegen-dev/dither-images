@@ -39,6 +39,7 @@ import {
 import { cn } from "@/lib/utils";
 import Cropper from "react-easy-crop";
 import Editor from "@monaco-editor/react";
+import TargetCursor from "./TargetCursor";
 
 const minGridSize = 64;
 const defaultGridSize = 200;
@@ -582,389 +583,398 @@ export default function DitherImageApp() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-black text-white p-4">
-      <div className="max-w-6xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="text-center space-y-2 pt-10">
-          <Shuffle
-            text="Image Dithering (Experimental)"
-            shuffleDirection="right"
-            duration={0.35}
-            animationMode="evenodd"
-            shuffleTimes={1}
-            ease="power3.out"
-            stagger={0.03}
-            threshold={0.1}
-            triggerOnce={true}
-            triggerOnHover={true}
-            respectReducedMotion={true}
-            onShuffleComplete={() => {}}
-            colorFrom="#ffffff"
-            colorTo="#ffffff"
-          />
-          <p className="text-muted-foreground">
-            Transform images into black and white dotted patterns
-          </p>
-        </div>
+    <>
+      <TargetCursor />
+      <div className="min-h-screen bg-black text-white p-4">
+        <div className="max-w-6xl mx-auto space-y-6">
+          {/* Header */}
+          <div className="text-center space-y-2 pt-10">
+            <Shuffle
+              text="Image Dithering (Experimental)"
+              shuffleDirection="right"
+              duration={0.35}
+              animationMode="evenodd"
+              shuffleTimes={1}
+              ease="power3.out"
+              stagger={0.03}
+              threshold={0.1}
+              triggerOnce={true}
+              triggerOnHover={true}
+              respectReducedMotion={true}
+              onShuffleComplete={() => {}}
+              colorFrom="#ffffff"
+              colorTo="#ffffff"
+            />
+            <p className="text-muted-foreground">
+              Transform images into black and white dotted patterns
+            </p>
+          </div>
 
-        {/* Upload Area */}
-        <Card className="p-6 border-border">
-          <div
-            className={cn(
-              "border-2 border-dashed border-white/20 rounded-lg p-8 text-center transition-colors",
-              isDragOver ? "border-white/20 bg-muted/10" : "border-white/30"
-            )}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-          >
-            {image ? (
-              <div className="space-y-4">
-                <div className="flex items-center justify-center space-x-2">
-                  <ImageIcon className="w-5 h-5" />
-                  <span>Image uploaded successfully</span>
-                </div>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setImage(null);
-                    if (fileInputRef.current) fileInputRef.current.value = "";
-                  }}
-                >
-                  Load a Different Image
-                </Button>
-              </div>
-            ) : (
-              <div className="space-y-6">
+          {/* Upload Area */}
+          <Card className="p-6 border-border">
+            <div
+              className={cn(
+                "border-2 border-dashed border-white/20 rounded-lg p-8 text-center transition-colors",
+                isDragOver ? "border-white/20 bg-muted/10" : "border-white/30"
+              )}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+            >
+              {image ? (
                 <div className="space-y-4">
-                  <Upload className="w-12 h-12 mx-auto text-muted-foreground" />
-                  <div>
-                    <p className="text-lg font-medium">Drop your image here</p>
-                    <p className="text-muted-foreground">or click to browse</p>
+                  <div className="flex items-center justify-center space-x-2">
+                    <ImageIcon className="w-5 h-5" />
+                    <span>Image uploaded successfully</span>
                   </div>
                   <Button
-                    onClick={() => fileInputRef.current?.click()}
-                    className="bg-white text-black hover:bg-gray-100"
+                    variant="outline"
+                    onClick={() => {
+                      setImage(null);
+                      if (fileInputRef.current) fileInputRef.current.value = "";
+                    }}
                   >
-                    Choose File
+                    Load a Different Image
                   </Button>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileInput}
-                    className="hidden"
-                  />
                 </div>
+              ) : (
+                <div className="space-y-6">
+                  <div className="space-y-4">
+                    <Upload className="w-12 h-12 mx-auto text-muted-foreground" />
+                    <div>
+                      <p className="text-lg font-medium">
+                        Drop your image here
+                      </p>
+                      <p className="text-muted-foreground">
+                        or click to browse
+                      </p>
+                    </div>
+                    <Button
+                      onClick={() => fileInputRef.current?.click()}
+                      className="bg-white text-black hover:bg-gray-100"
+                    >
+                      Choose File
+                    </Button>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileInput}
+                      className="hidden"
+                    />
+                  </div>
 
-                {/* Example Images */}
-                <div className="border-t border-white/10 pt-6">
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Or try these examples:
-                  </p>
-                  <div className="grid grid-cols-4 gap-2">
-                    {[1, 2, 3, 4, 5, 6, 7].map((num) => (
-                      <button
-                        key={num}
-                        onClick={() => {
-                          setOriginalImage(`/assets/example${num}.png`);
-                          setShowCropDialog(true);
-                        }}
-                        className="aspect-square rounded-lg overflow-hidden border border-white/20 hover:border-white/40 transition-all duration-300 filter grayscale hover:grayscale-0"
-                      >
-                        <img
-                          src={`/assets/example${num}.png`}
-                          alt={`Example ${num}`}
-                          className="w-full h-full object-cover"
-                        />
-                      </button>
-                    ))}
+                  {/* Example Images */}
+                  <div className="border-t border-white/10 pt-6">
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Or try these examples:
+                    </p>
+                    <div className="grid grid-cols-4 gap-2">
+                      {[1, 2, 3, 4, 5, 6, 7].map((num) => (
+                        <button
+                          key={num}
+                          onClick={() => {
+                            setOriginalImage(`/assets/example${num}.png`);
+                            setShowCropDialog(true);
+                          }}
+                          className="aspect-square rounded-lg overflow-hidden border border-white/20 hover:border-white/40 transition-all duration-300 filter grayscale hover:grayscale-0"
+                        >
+                          <img
+                            src={`/assets/example${num}.png`}
+                            alt={`Example ${num}`}
+                            className="w-full h-full object-cover"
+                          />
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
-          </div>
-        </Card>
+              )}
+            </div>
+          </Card>
 
-        {/* Controls */}
-        {image && (
-          <Card className="p-6 border-border">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <label className="text-sm font-medium">Grid Complexity</label>
-                <div className="flex items-center space-x-2">
-                  <Input
-                    type="number"
-                    value={gridSize}
-                    onChange={(e) => {
-                      const value = parseInt(e.target.value);
-                      if (!isNaN(value) && value >= 16 && value <= 512) {
-                        setGridSize(value);
-                      }
-                    }}
-                    min={minGridSize}
-                    max={maxGridSize}
-                    className="w-20 h-8 text-center bg-black border-white/20 text-white"
-                  />
-                  <span className="text-muted-foreground text-sm">
-                    ×{gridSize}
+          {/* Controls */}
+          {image && (
+            <Card className="p-6 border-border">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium">Grid Complexity</label>
+                  <div className="flex items-center space-x-2">
+                    <Input
+                      type="number"
+                      value={gridSize}
+                      onChange={(e) => {
+                        const value = parseInt(e.target.value);
+                        if (!isNaN(value) && value >= 16 && value <= 512) {
+                          setGridSize(value);
+                        }
+                      }}
+                      min={minGridSize}
+                      max={maxGridSize}
+                      className="w-20 h-8 text-center bg-black border-white/20 text-white"
+                    />
+                    <span className="text-muted-foreground text-sm">
+                      ×{gridSize}
+                    </span>
+                  </div>
+                </div>
+                <Slider
+                  value={[gridSize]}
+                  onValueChange={(value) => setGridSize(value[0])}
+                  min={minGridSize}
+                  max={maxGridSize}
+                  step={1}
+                  className="w-full text-black rounded-full"
+                />
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>
+                    {minGridSize}×{minGridSize} (Blocky)
+                  </span>
+                  <span>
+                    {maxGridSize}×{maxGridSize} (Detailed)
                   </span>
                 </div>
               </div>
-              <Slider
-                value={[gridSize]}
-                onValueChange={(value) => setGridSize(value[0])}
-                min={minGridSize}
-                max={maxGridSize}
-                step={1}
-                className="w-full text-black rounded-full"
-              />
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>
-                  {minGridSize}×{minGridSize} (Blocky)
-                </span>
-                <span>
-                  {maxGridSize}×{maxGridSize} (Detailed)
-                </span>
-              </div>
-            </div>
-          </Card>
-        )}
-
-        {/* Preview Area */}
-        {image && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Original Image */}
-            <Card className="p-4 border-border">
-              <h3 className="text-lg font-medium mb-4">Original</h3>
-              <div className="aspect-square bg-muted/10 rounded-lg overflow-hidden">
-                <img
-                  src={image}
-                  alt="Original"
-                  className="w-full h-full object-cover"
-                />
-              </div>
             </Card>
+          )}
 
-            {/* Dithered Image */}
-            <Card className="p-4 border-border">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-medium">Dithered</h3>
-                <div className="flex items-center space-x-2">
-                  {/* Retry Button */}
-                  {image && !isProcessing && (
+          {/* Preview Area */}
+          {image && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Original Image */}
+              <Card className="p-4 border-border">
+                <h3 className="text-lg font-medium mb-4">Original</h3>
+                <div className="aspect-square bg-muted/10 rounded-lg overflow-hidden">
+                  <img
+                    src={image}
+                    alt="Original"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </Card>
+
+              {/* Dithered Image */}
+              <Card className="p-4 border-border">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-medium">Dithered</h3>
+                  <div className="flex items-center space-x-2">
+                    {/* Retry Button */}
+                    {image && !isProcessing && (
+                      <Button
+                        onClick={() => {
+                          if (image) {
+                            debouncedGenerateDitheredImage();
+                          }
+                        }}
+                        size="icon"
+                        variant="ghost"
+                        className="text-white hover:bg-white/10 cursor-pointer"
+                      >
+                        <RefreshCcw className="w-4 h-4" />
+                      </Button>
+                    )}
                     <Button
-                      onClick={() => {
-                        if (image) {
-                          debouncedGenerateDitheredImage();
-                        }
-                      }}
-                      size="icon"
-                      variant="ghost"
-                      className="text-white hover:bg-white/10 cursor-pointer"
+                      onClick={handleViewSvgCode}
+                      disabled={isProcessing}
+                      size="sm"
+                      variant="outline"
+                      className="border-white/20 text-white hover:bg-white/10"
                     >
-                      <RefreshCcw className="w-4 h-4" />
+                      <Code className="w-4 h-4 mr-2" />
+                      View SVG Code
                     </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          disabled={isProcessing}
+                          size="sm"
+                          className="bg-white text-black hover:bg-gray-100"
+                        >
+                          Export
+                          <ChevronDown className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="bg-black border-white/20">
+                        <DropdownMenuItem
+                          onClick={handleExportPNG}
+                          className="text-white hover:bg-white/10 cursor-pointer"
+                        >
+                          <ImageIcon className="w-4 h-4" />
+                          Download as PNG
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator className="bg-white/20" />
+                        <DropdownMenuItem
+                          onClick={handleCopyPNG}
+                          className="text-white hover:bg-white/10 cursor-pointer"
+                        >
+                          <Copy className="w-4 h-4" />
+                          Copy as PNG
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </div>
+                <div className="aspect-square bg-white rounded-lg overflow-hidden relative flex items-center justify-center">
+                  {isProcessing ? (
+                    <div className="flex items-center justify-center h-full">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
+                    </div>
+                  ) : (
+                    <svg
+                      ref={svgRef}
+                      width="400"
+                      height="400"
+                      viewBox="0 0 400 400"
+                      className="dither-svg w-full h-full"
+                      style={{ backgroundColor: "#ffffff" }}
+                      preserveAspectRatio="xMidYMid meet"
+                    />
                   )}
+                </div>
+              </Card>
+            </div>
+          )}
+
+          {/* Crop Dialog */}
+          <Dialog open={showCropDialog} onOpenChange={setShowCropDialog}>
+            <DialogContent className="max-w-4xl bg-black border-white/20">
+              <DialogHeader>
+                <DialogTitle className="flex items-center space-x-2 text-white">
+                  <Crop className="w-5 h-5" />
+                  <span>Crop Image to Square</span>
+                </DialogTitle>
+                <DialogDescription className="text-muted-foreground">
+                  Drag to reposition and use the slider to zoom. The crop area
+                  will be forced to a square.
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-4">
+                <div className="relative h-96 bg-gray-900 rounded-lg overflow-hidden">
+                  {originalImage && (
+                    <Cropper
+                      image={originalImage}
+                      crop={crop}
+                      zoom={zoom}
+                      aspect={1}
+                      onCropChange={setCrop}
+                      onCropComplete={onCropComplete}
+                      onZoomChange={setZoom}
+                      showGrid={true}
+                      style={{
+                        containerStyle: {
+                          width: "100%",
+                          height: "100%",
+                          position: "relative",
+                        },
+                      }}
+                    />
+                  )}
+                </div>
+
+                <div className="flex items-center space-x-4">
+                  <label className="text-sm font-medium text-white">
+                    Zoom:
+                  </label>
+                  <Slider
+                    value={[zoom]}
+                    onValueChange={(value) => setZoom(value[0])}
+                    min={1}
+                    max={3}
+                    step={0.1}
+                    className="flex-1"
+                  />
+                  <span className="text-sm text-muted-foreground">
+                    {Math.round(zoom * 100)}%
+                  </span>
+                </div>
+
+                <div className="flex justify-end space-x-2">
                   <Button
-                    onClick={handleViewSvgCode}
-                    disabled={isProcessing}
-                    size="sm"
                     variant="outline"
+                    onClick={handleCropCancel}
                     className="border-white/20 text-white hover:bg-white/10"
                   >
-                    <Code className="w-4 h-4 mr-2" />
-                    View SVG Code
+                    Cancel
                   </Button>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        disabled={isProcessing}
-                        size="sm"
-                        className="bg-white text-black hover:bg-gray-100"
-                      >
-                        Export
-                        <ChevronDown className="w-4 h-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="bg-black border-white/20">
-                      <DropdownMenuItem
-                        onClick={handleExportPNG}
-                        className="text-white hover:bg-white/10 cursor-pointer"
-                      >
-                        <ImageIcon className="w-4 h-4" />
-                        Download as PNG
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator className="bg-white/20" />
-                      <DropdownMenuItem
-                        onClick={handleCopyPNG}
-                        className="text-white hover:bg-white/10 cursor-pointer"
-                      >
-                        <Copy className="w-4 h-4" />
-                        Copy as PNG
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <Button
+                    onClick={handleCropConfirm}
+                    className="bg-white text-black hover:bg-gray-100"
+                  >
+                    <Crop className="w-4 h-4 mr-2" />
+                    Crop & Continue
+                  </Button>
                 </div>
               </div>
-              <div className="aspect-square bg-white rounded-lg overflow-hidden relative flex items-center justify-center">
-                {isProcessing ? (
-                  <div className="flex items-center justify-center h-full">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
-                  </div>
-                ) : (
-                  <svg
-                    ref={svgRef}
-                    width="400"
-                    height="400"
-                    viewBox="0 0 400 400"
-                    className="dither-svg w-full h-full"
-                    style={{ backgroundColor: "#ffffff" }}
-                    preserveAspectRatio="xMidYMid meet"
-                  />
-                )}
-              </div>
-            </Card>
-          </div>
-        )}
+            </DialogContent>
+          </Dialog>
 
-        {/* Crop Dialog */}
-        <Dialog open={showCropDialog} onOpenChange={setShowCropDialog}>
-          <DialogContent className="max-w-4xl bg-black border-white/20">
-            <DialogHeader>
-              <DialogTitle className="flex items-center space-x-2 text-white">
-                <Crop className="w-5 h-5" />
-                <span>Crop Image to Square</span>
-              </DialogTitle>
-              <DialogDescription className="text-muted-foreground">
-                Drag to reposition and use the slider to zoom. The crop area
-                will be forced to a square.
-              </DialogDescription>
-            </DialogHeader>
+          {/* SVG Code Dialog */}
+          <Dialog open={showSvgCodeDialog} onOpenChange={setShowSvgCodeDialog}>
+            <DialogContent className="max-w-4xl bg-black border-white/20">
+              <DialogHeader>
+                <DialogTitle className="flex items-center space-x-2 text-white">
+                  <Code className="w-5 h-5" />
+                  <span>SVG Code</span>
+                </DialogTitle>
+                <DialogDescription className="text-muted-foreground">
+                  View and copy the generated SVG code for your dithered image.
+                </DialogDescription>
+              </DialogHeader>
 
-            <div className="space-y-4">
-              <div className="relative h-96 bg-gray-900 rounded-lg overflow-hidden">
-                {originalImage && (
-                  <Cropper
-                    image={originalImage}
-                    crop={crop}
-                    zoom={zoom}
-                    aspect={1}
-                    onCropChange={setCrop}
-                    onCropComplete={onCropComplete}
-                    onZoomChange={setZoom}
-                    showGrid={true}
-                    style={{
-                      containerStyle: {
-                        width: "100%",
-                        height: "100%",
-                        position: "relative",
-                      },
+              <div className="space-y-4">
+                <div className="h-96 border border-white/20 rounded-lg overflow-hidden">
+                  <Editor
+                    height="100%"
+                    defaultLanguage="xml"
+                    value={svgCode}
+                    theme="vs-dark"
+                    options={{
+                      readOnly: true,
+                      minimap: { enabled: false },
+                      scrollBeyondLastLine: false,
+                      wordWrap: "on",
+                      fontSize: 14,
+                      lineNumbers: "on",
+                      folding: true,
+                      lineDecorationsWidth: 0,
+                      lineNumbersMinChars: 3,
                     }}
                   />
-                )}
-              </div>
+                </div>
 
-              <div className="flex items-center space-x-4">
-                <label className="text-sm font-medium text-white">Zoom:</label>
-                <Slider
-                  value={[zoom]}
-                  onValueChange={(value) => setZoom(value[0])}
-                  min={1}
-                  max={3}
-                  step={0.1}
-                  className="flex-1"
-                />
-                <span className="text-sm text-muted-foreground">
-                  {Math.round(zoom * 100)}%
-                </span>
+                <div className="flex justify-end space-x-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowSvgCodeDialog(false)}
+                    className="border-white/20 text-white hover:bg-white/10"
+                  >
+                    Close
+                  </Button>
+                  <Button
+                    onClick={handleCopySVG}
+                    className="bg-white text-black hover:bg-gray-100"
+                  >
+                    {isCopied ? (
+                      <Check className="w-4 h-4 mr-2" />
+                    ) : (
+                      <Copy className="w-4 h-4 mr-2" />
+                    )}
+                    {isCopied ? "Copied!" : "Copy SVG Code"}
+                  </Button>
+                  <Button
+                    onClick={handleExportSVG}
+                    className="bg-white text-black hover:bg-gray-100"
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Download as SVG
+                  </Button>
+                </div>
               </div>
-
-              <div className="flex justify-end space-x-2">
-                <Button
-                  variant="outline"
-                  onClick={handleCropCancel}
-                  className="border-white/20 text-white hover:bg-white/10"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  onClick={handleCropConfirm}
-                  className="bg-white text-black hover:bg-gray-100"
-                >
-                  <Crop className="w-4 h-4 mr-2" />
-                  Crop & Continue
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
-
-        {/* SVG Code Dialog */}
-        <Dialog open={showSvgCodeDialog} onOpenChange={setShowSvgCodeDialog}>
-          <DialogContent className="max-w-4xl bg-black border-white/20">
-            <DialogHeader>
-              <DialogTitle className="flex items-center space-x-2 text-white">
-                <Code className="w-5 h-5" />
-                <span>SVG Code</span>
-              </DialogTitle>
-              <DialogDescription className="text-muted-foreground">
-                View and copy the generated SVG code for your dithered image.
-              </DialogDescription>
-            </DialogHeader>
-
-            <div className="space-y-4">
-              <div className="h-96 border border-white/20 rounded-lg overflow-hidden">
-                <Editor
-                  height="100%"
-                  defaultLanguage="xml"
-                  value={svgCode}
-                  theme="vs-dark"
-                  options={{
-                    readOnly: true,
-                    minimap: { enabled: false },
-                    scrollBeyondLastLine: false,
-                    wordWrap: "on",
-                    fontSize: 14,
-                    lineNumbers: "on",
-                    folding: true,
-                    lineDecorationsWidth: 0,
-                    lineNumbersMinChars: 3,
-                  }}
-                />
-              </div>
-
-              <div className="flex justify-end space-x-2">
-                <Button
-                  variant="outline"
-                  onClick={() => setShowSvgCodeDialog(false)}
-                  className="border-white/20 text-white hover:bg-white/10"
-                >
-                  Close
-                </Button>
-                <Button
-                  onClick={handleCopySVG}
-                  className="bg-white text-black hover:bg-gray-100"
-                >
-                  {isCopied ? (
-                    <Check className="w-4 h-4 mr-2" />
-                  ) : (
-                    <Copy className="w-4 h-4 mr-2" />
-                  )}
-                  {isCopied ? "Copied!" : "Copy SVG Code"}
-                </Button>
-                <Button
-                  onClick={handleExportSVG}
-                  className="bg-white text-black hover:bg-gray-100"
-                >
-                  <Download className="w-4 h-4 mr-2" />
-                  Download as SVG
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
