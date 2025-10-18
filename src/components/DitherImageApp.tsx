@@ -1,15 +1,16 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-empty-object-type */
+
 "use client";
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import {
   Upload,
-  Download,
   Image as ImageIcon,
   Crop,
-  X,
   RefreshCcw,
   Copy,
-  ArrowDown,
   ChevronDown,
   FileIcon,
 } from "lucide-react";
@@ -34,8 +35,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import Cropper from "react-easy-crop";
-
-interface DitherImageAppProps {}
 
 const minGridSize = 16;
 const defaultGridSize = 128;
