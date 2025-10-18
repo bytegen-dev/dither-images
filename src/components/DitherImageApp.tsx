@@ -36,8 +36,8 @@ import {
 import { cn } from "@/lib/utils";
 import Cropper from "react-easy-crop";
 
-const minGridSize = 16;
-const defaultGridSize = 128;
+const minGridSize = 64;
+const defaultGridSize = 200;
 const maxGridSize = 400;
 
 export default function DitherImageApp() {
@@ -606,29 +606,56 @@ export default function DitherImageApp() {
                     if (fileInputRef.current) fileInputRef.current.value = "";
                   }}
                 >
-                  Upload Different Image
+                  Load a Different Image
                 </Button>
               </div>
             ) : (
-              <div className="space-y-4">
-                <Upload className="w-12 h-12 mx-auto text-muted-foreground" />
-                <div>
-                  <p className="text-lg font-medium">Drop your image here</p>
-                  <p className="text-muted-foreground">or click to browse</p>
+              <div className="space-y-6">
+                <div className="space-y-4">
+                  <Upload className="w-12 h-12 mx-auto text-muted-foreground" />
+                  <div>
+                    <p className="text-lg font-medium">Drop your image here</p>
+                    <p className="text-muted-foreground">or click to browse</p>
+                  </div>
+                  <Button
+                    onClick={() => fileInputRef.current?.click()}
+                    className="bg-white text-black hover:bg-gray-100"
+                  >
+                    Choose File
+                  </Button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileInput}
+                    className="hidden"
+                  />
                 </div>
-                <Button
-                  onClick={() => fileInputRef.current?.click()}
-                  className="bg-white text-black hover:bg-gray-100"
-                >
-                  Choose File
-                </Button>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileInput}
-                  className="hidden"
-                />
+
+                {/* Example Images */}
+                <div className="border-t border-white/10 pt-6">
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Or try these examples:
+                  </p>
+                  <div className="grid grid-cols-4 gap-2">
+                    {[1, 2, 3, 4, 5, 6, 7].map((num) => (
+                      <button
+                        key={num}
+                        onClick={() => {
+                          setOriginalImage(`/assets/example${num}.png`);
+                          setShowCropDialog(true);
+                        }}
+                        className="aspect-square rounded-lg overflow-hidden border border-white/20 hover:border-white/40 transition-all duration-300 filter grayscale hover:grayscale-0"
+                      >
+                        <img
+                          src={`/assets/example${num}.png`}
+                          alt={`Example ${num}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
             )}
           </div>
