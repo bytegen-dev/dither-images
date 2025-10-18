@@ -146,6 +146,18 @@ export default function DitherImageApp() {
     setCroppedAreaPixels(null);
   }, []);
 
+  // Reset crop dialog state when dialog closes
+  const handleCropDialogChange = useCallback((open: boolean) => {
+    setShowCropDialog(open);
+    if (!open) {
+      // Reset state when dialog closes
+      setOriginalImage(null);
+      setCrop({ x: 0, y: 0 });
+      setZoom(1);
+      setCroppedAreaPixels(null);
+    }
+  }, []);
+
   // Helper function to create cropped image
   const createImage = (url: string): Promise<HTMLImageElement> =>
     new Promise((resolve, reject) => {
@@ -585,10 +597,10 @@ export default function DitherImageApp() {
   return (
     <>
       <TargetCursor />
-      <div className="min-h-screen bg-black text-white p-4">
+      <div className="min-h-screen bg-black text-white p-4 py-16">
         <div className="max-w-6xl mx-auto space-y-6">
           {/* Header */}
-          <div className="text-center space-y-2 pt-10">
+          <div className="text-center space-y-2">
             <Shuffle
               text="Image Dithering (Experimental)"
               shuffleDirection="right"
@@ -641,7 +653,7 @@ export default function DitherImageApp() {
               ) : (
                 <div className="space-y-6">
                   <div className="space-y-4">
-                    <Upload className="w-12 h-12 mx-auto text-muted-foreground" />
+                    <Upload className="w-8 h-8 md:w-10 md:h-10 mx-auto text-muted-foreground" />
                     <div>
                       <p className="text-lg font-medium">
                         Drop your image here
@@ -670,7 +682,7 @@ export default function DitherImageApp() {
                     <p className="text-sm text-muted-foreground mb-4">
                       Or try these examples:
                     </p>
-                    <div className="grid grid-cols-4 gap-2">
+                    <div className="grid grid-cols-3 md:grid-cols-4 gap-2 sm:gap-2">
                       {[1, 2, 3, 4, 5, 6, 7].map((num) => (
                         <button
                           key={num}
@@ -837,7 +849,7 @@ export default function DitherImageApp() {
           )}
 
           {/* Crop Dialog */}
-          <Dialog open={showCropDialog} onOpenChange={setShowCropDialog}>
+          <Dialog open={showCropDialog} onOpenChange={handleCropDialogChange}>
             <DialogContent className="max-w-4xl bg-black border-white/20">
               <DialogHeader>
                 <DialogTitle className="flex items-center space-x-2 text-white">
