@@ -574,6 +574,9 @@ export default function DitherImageApp() {
             triggerOnce={true}
             triggerOnHover={true}
             respectReducedMotion={true}
+            onShuffleComplete={() => {}}
+            colorFrom="#ffffff"
+            colorTo="#ffffff"
           />
           <p className="text-muted-foreground">
             Transform images into black and white dotted patterns
@@ -584,11 +587,8 @@ export default function DitherImageApp() {
         <Card className="p-6 border-border">
           <div
             className={cn(
-              "border-2 border-dashed rounded-lg p-8 text-center transition-colors",
-              isDragOver
-                ? "border-foreground bg-muted/10"
-                : "border-muted-foreground",
-              image && "border-green-500"
+              "border-2 border-dashed border-white/20 rounded-lg p-8 text-center transition-colors",
+              isDragOver ? "border-white/20 bg-muted/10" : "border-white/30"
             )}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
@@ -596,7 +596,7 @@ export default function DitherImageApp() {
           >
             {image ? (
               <div className="space-y-4">
-                <div className="flex items-center justify-center space-x-2 text-green-500">
+                <div className="flex items-center justify-center space-x-2">
                   <ImageIcon className="w-5 h-5" />
                   <span>Image uploaded successfully</span>
                 </div>
