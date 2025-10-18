@@ -15,6 +15,7 @@ import {
   FileIcon,
   Code,
   Check,
+  Download,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -750,6 +751,21 @@ export default function DitherImageApp() {
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-medium">Dithered</h3>
                 <div className="flex items-center space-x-2">
+                  {/* Retry Button */}
+                  {image && !isProcessing && (
+                    <Button
+                      onClick={() => {
+                        if (image) {
+                          debouncedGenerateDitheredImage();
+                        }
+                      }}
+                      size="icon"
+                      variant="ghost"
+                      className="text-white hover:bg-white/10 cursor-pointer"
+                    >
+                      <RefreshCcw className="w-4 h-4" />
+                    </Button>
+                  )}
                   <Button
                     onClick={handleViewSvgCode}
                     disabled={isProcessing}
@@ -779,13 +795,6 @@ export default function DitherImageApp() {
                         <ImageIcon className="w-4 h-4" />
                         Download as PNG
                       </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={handleExportSVG}
-                        className="text-white hover:bg-white/10 cursor-pointer"
-                      >
-                        <FileIcon className="w-4 h-4" />
-                        Download as SVG
-                      </DropdownMenuItem>
                       <DropdownMenuSeparator className="bg-white/20" />
                       <DropdownMenuItem
                         onClick={handleCopyPNG}
@@ -793,13 +802,6 @@ export default function DitherImageApp() {
                       >
                         <Copy className="w-4 h-4" />
                         Copy as PNG
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={handleCopySVG}
-                        className="text-white hover:bg-white/10 cursor-pointer"
-                      >
-                        <Copy className="w-4 h-4" />
-                        Copy as SVG
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -820,22 +822,6 @@ export default function DitherImageApp() {
                     style={{ backgroundColor: "#ffffff" }}
                     preserveAspectRatio="xMidYMid meet"
                   />
-                )}
-
-                {/* Retry Button */}
-                {image && !isProcessing && (
-                  <Button
-                    onClick={() => {
-                      if (image) {
-                        debouncedGenerateDitheredImage();
-                      }
-                    }}
-                    className="absolute bottom-4 right-4 bg-black/80 hover:bg-black text-white border border-white/20"
-                    size="sm"
-                  >
-                    <RefreshCcw className="w-4 h-4 mr-2" />
-                    Retry
-                  </Button>
                 )}
               </div>
             </Card>
@@ -966,6 +952,13 @@ export default function DitherImageApp() {
                     <Copy className="w-4 h-4 mr-2" />
                   )}
                   {isCopied ? "Copied!" : "Copy SVG Code"}
+                </Button>
+                <Button
+                  onClick={handleExportSVG}
+                  className="bg-white text-black hover:bg-gray-100"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Download as SVG
                 </Button>
               </div>
             </div>

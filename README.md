@@ -39,6 +39,10 @@ Open [http://localhost:3000](http://localhost:3000) to view the app.
 3. Adjust grid complexity with the slider
 4. Export as PNG/SVG or copy to clipboard
 
+## Known Issues
+
+- **PNG Export/Copy**: Download and copy as PNG functionality is not optimized and may crash the browser, especially with high grid complexity or large images. This is due to limitations in the html2canvas library when rendering complex SVG elements. Use SVG export/copy as an alternative.
+
 ## License
 
 MIT
