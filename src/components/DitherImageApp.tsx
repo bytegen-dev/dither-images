@@ -332,8 +332,9 @@ export default function DitherImageApp() {
                 Math.min(1, brightness + noise)
               );
 
-              // More sophisticated dot distribution
-              const dotCount = Math.floor(adjustedBrightness * 8); // 0-8 dots per cell
+              // Optimized dot distribution - limit dots for performance
+              const maxDots = Math.min(4, Math.floor(gridSize / 50)); // Scale with grid size
+              const dotCount = Math.floor(adjustedBrightness * maxDots);
               const dotDensity = Math.pow(adjustedBrightness, 0.7); // Non-linear density
               const dotSize = Math.max(
                 0.3,
@@ -345,35 +346,31 @@ export default function DitherImageApp() {
               const startX = x * cellSize + gridSpacing;
               const startY = y * cellSize + gridSpacing;
 
+              // Pre-calculate positions to avoid repeated calculations
+              const cellCenterX = x * cellSize + cellSize / 2;
+              const cellCenterY = y * cellSize + cellSize / 2;
+
               for (let i = 0; i < dotCount; i++) {
                 const circle = document.createElementNS(
                   "http://www.w3.org/2000/svg",
                   "circle"
                 );
 
-                // Better dot positioning using grid + randomness
+                // Simplified dot positioning
                 let dotX, dotY;
 
-                if (i < 4) {
-                  // Place dots in a 2x2 grid pattern
-                  const gridX = (i % 2) * gridSpacing;
-                  const gridY = Math.floor(i / 2) * gridSpacing;
-                  dotX = startX + gridX;
-                  dotY = startY + gridY;
+                if (i < 2) {
+                  // Simple 2-dot pattern for better performance
+                  dotX = startX + i * gridSpacing;
+                  dotY = startY;
                 } else {
                   // Random placement for additional dots
-                  dotX =
-                    x * cellSize +
-                    cellSize / 2 +
-                    (Math.random() - 0.5) * cellSize * 0.6;
-                  dotY =
-                    y * cellSize +
-                    cellSize / 2 +
-                    (Math.random() - 0.5) * cellSize * 0.6;
+                  dotX = cellCenterX + (Math.random() - 0.5) * cellSize * 0.8;
+                  dotY = cellCenterY + (Math.random() - 0.5) * cellSize * 0.8;
                 }
 
-                // Add subtle randomness
-                const jitter = cellSize * 0.05;
+                // Reduced jitter for better performance
+                const jitter = cellSize * 0.02;
                 dotX += (Math.random() - 0.5) * jitter;
                 dotY += (Math.random() - 0.5) * jitter;
 
@@ -432,7 +429,7 @@ export default function DitherImageApp() {
         generateDitheredImage();
       }
     }, 300); // 300ms debounce
-  }, [image, gridSize, generateDitheredImage]);
+  }, [image, gridSize]);
 
   // Regenerate dither when image changes
   useEffect(() => {
