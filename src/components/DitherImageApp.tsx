@@ -604,6 +604,7 @@ export default function DitherImageApp() {
               onShuffleComplete={() => {}}
               colorFrom="#ffffff"
               colorTo="#ffffff"
+              className="shuffler w-full text-center"
             />
             <p className="text-muted-foreground">
               Transform images into black and white dotted patterns
@@ -611,7 +612,7 @@ export default function DitherImageApp() {
           </div>
 
           {/* Upload Area */}
-          <Card className="p-6 border-border">
+          <Card className="p-4 md:p-6 border-border">
             <div
               className={cn(
                 "border-2 border-dashed border-white/20 rounded-lg p-8 text-center transition-colors",
@@ -677,12 +678,12 @@ export default function DitherImageApp() {
                             setOriginalImage(`/assets/example${num}.png`);
                             setShowCropDialog(true);
                           }}
-                          className="aspect-square rounded-lg overflow-hidden border border-white/20 hover:border-white/40 transition-all duration-300 filter grayscale hover:grayscale-0"
+                          className="aspect-square rounded-lg overflow-hidden border border-white/20 hover:border-white/40 transition-all duration-300 filter grayscale hover:grayscale-0 cursor-pointer"
                         >
                           <img
                             src={`/assets/example${num}.png`}
                             alt={`Example ${num}`}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover hover:scale-120 transition-all duration-300"
                           />
                         </button>
                       ))}

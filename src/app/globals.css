@@ -87,3 +87,13 @@ body {
   border-right: none;
   border-top: none;
 }
+
+.shuffler {
+  @media screen and (max-width: 800px) {
+    font-size: 2rem !important;
+  }
+
+  @media screen and (max-width: 600px) {
+    font-size: 1.5rem !important;
+  }
+}
