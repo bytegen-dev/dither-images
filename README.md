@@ -1,6 +1,8 @@
 # Image Dithering App
 
-A minimalist web app that converts images into black-and-white dotted patterns using dithering algorithms.
+<img width="1253" height="1239" alt="image" src="https://github.com/user-attachments/assets/74d6da00-2dac-4ccb-a2d7-317da146a1cc" />
+
+A basic web app that converts images into black-and-white dotted patterns using dithering algorithms.
 
 ## Features
 
