@@ -9,6 +9,8 @@
   --input: #171717;
   --ring: #ffffff;
   --radius: 0.5rem;
+  --primary: #ffffff;
+  --primary-foreground: #000000;
 }
 
 body {

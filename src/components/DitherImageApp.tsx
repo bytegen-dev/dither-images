@@ -11,7 +11,6 @@ import {
   Crop,
   RefreshCcw,
   Copy,
-  ChevronDown,
   FileIcon,
   Code,
   Check,
@@ -29,13 +28,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import Cropper from "react-easy-crop";
 import Editor from "@monaco-editor/react";
@@ -798,38 +790,18 @@ export default function DitherImageApp() {
                       variant="outline"
                       className="border-white/20 text-white hover:bg-white/10"
                     >
-                      <Code className="w-4 h-4 mr-2" />
+                      <Code className="w-4 h-4" />
                       SVG code
                     </Button>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          disabled={isProcessing}
-                          size="sm"
-                          className="bg-white text-black hover:bg-gray-100"
-                        >
-                          Export
-                          <ChevronDown className="w-4 h-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent className="bg-black border-white/20">
-                        <DropdownMenuItem
-                          onClick={handleExportPNG}
-                          className="text-white hover:bg-white/10 cursor-pointer"
-                        >
-                          <ImageIcon className="w-4 h-4" />
-                          Download as PNG
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator className="bg-white/20" />
-                        <DropdownMenuItem
-                          onClick={handleCopyPNG}
-                          className="text-white hover:bg-white/10 cursor-pointer"
-                        >
-                          <Copy className="w-4 h-4" />
-                          Copy as PNG
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    <Button
+                      onClick={handleExportPNG}
+                      disabled={isProcessing}
+                      size="sm"
+                      variant="outline"
+                      className="border-white/20 text-white hover:bg-white/10"
+                    >
+                      <Download className="w-4 h-4" /> Download
+                    </Button>
                   </div>
                 </div>
                 <div className="aspect-square bg-white rounded-lg overflow-hidden relative flex items-center justify-center">
