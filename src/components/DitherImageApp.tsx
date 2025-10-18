@@ -4,7 +4,7 @@
 
 "use client";
 
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import {
   Upload,
   Image as ImageIcon,
