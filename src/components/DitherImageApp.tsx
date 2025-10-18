@@ -448,45 +448,49 @@ export default function DitherImageApp() {
     }
   }, [gridSize, debouncedGenerateDitheredImage]);
 
-  // Export functions
+  // Export functions - Direct canvas rendering instead of html2canvas
   const handleExportPNG = useCallback(async () => {
     if (!svgRef.current) return;
 
     try {
-      const { default: html2canvas } = await import("html2canvas");
+      // Create a canvas for direct rendering
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
 
-      // Create a temporary container to ensure proper rendering
-      const tempContainer = document.createElement("div");
-      tempContainer.style.position = "absolute";
-      tempContainer.style.left = "-9999px";
-      tempContainer.style.top = "-9999px";
-      tempContainer.style.width = "400px";
-      tempContainer.style.height = "400px";
-      tempContainer.style.backgroundColor = "#ffffff";
+      // Set canvas size
+      canvas.width = 800; // Higher resolution
+      canvas.height = 800;
 
-      // Clone the SVG
-      const svgClone = svgRef.current.cloneNode(true) as SVGSVGElement;
-      svgClone.style.width = "400px";
-      svgClone.style.height = "400px";
-      tempContainer.appendChild(svgClone);
-      document.body.appendChild(tempContainer);
+      // Fill with white background
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      const canvas = await html2canvas(tempContainer, {
-        backgroundColor: "#ffffff",
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        foreignObjectRendering: true,
-        width: 400,
-        height: 400,
+      // Get SVG data and render directly
+      const svgData = new XMLSerializer().serializeToString(svgRef.current);
+      const svgBlob = new Blob([svgData], {
+        type: "image/svg+xml;charset=utf-8",
+      });
+      const svgUrl = URL.createObjectURL(svgBlob);
+
+      // Create image from SVG
+      const img = new Image();
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+        img.src = svgUrl;
       });
 
-      // Clean up
-      document.body.removeChild(tempContainer);
+      // Draw the SVG image to canvas
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
+      // Clean up
+      URL.revokeObjectURL(svgUrl);
+
+      // Download
       const link = document.createElement("a");
       link.download = "dithered-image.png";
-      link.href = canvas.toDataURL();
+      link.href = canvas.toDataURL("image/png");
       link.click();
     } catch (error) {
       console.error("PNG export failed:", error);
@@ -518,37 +522,41 @@ export default function DitherImageApp() {
     if (!svgRef.current) return;
 
     try {
-      const { default: html2canvas } = await import("html2canvas");
+      // Create a canvas for direct rendering
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
 
-      // Create a temporary container to ensure proper rendering
-      const tempContainer = document.createElement("div");
-      tempContainer.style.position = "absolute";
-      tempContainer.style.left = "-9999px";
-      tempContainer.style.top = "-9999px";
-      tempContainer.style.width = "400px";
-      tempContainer.style.height = "400px";
-      tempContainer.style.backgroundColor = "#ffffff";
+      // Set canvas size
+      canvas.width = 800; // Higher resolution
+      canvas.height = 800;
 
-      // Clone the SVG
-      const svgClone = svgRef.current.cloneNode(true) as SVGSVGElement;
-      svgClone.style.width = "400px";
-      svgClone.style.height = "400px";
-      tempContainer.appendChild(svgClone);
-      document.body.appendChild(tempContainer);
+      // Fill with white background
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      const canvas = await html2canvas(tempContainer, {
-        backgroundColor: "#ffffff",
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        foreignObjectRendering: true,
-        width: 400,
-        height: 400,
+      // Get SVG data and render directly
+      const svgData = new XMLSerializer().serializeToString(svgRef.current);
+      const svgBlob = new Blob([svgData], {
+        type: "image/svg+xml;charset=utf-8",
+      });
+      const svgUrl = URL.createObjectURL(svgBlob);
+
+      // Create image from SVG
+      const img = new Image();
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+        img.src = svgUrl;
       });
 
-      // Clean up
-      document.body.removeChild(tempContainer);
+      // Draw the SVG image to canvas
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
+      // Clean up
+      URL.revokeObjectURL(svgUrl);
+
+      // Copy to clipboard
       canvas.toBlob(async (blob) => {
         if (blob) {
           try {
