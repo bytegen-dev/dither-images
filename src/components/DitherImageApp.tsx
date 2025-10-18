@@ -596,7 +596,7 @@ export default function DitherImageApp() {
 
   return (
     <>
-      <TargetCursor />
+      {/* <TargetCursor /> */}
       <div className="min-h-screen bg-black text-white p-4 py-16">
         <div className="max-w-6xl mx-auto space-y-6">
           {/* Header */}
@@ -935,8 +935,8 @@ export default function DitherImageApp() {
                 </DialogDescription>
               </DialogHeader>
 
-              <div className="space-y-4">
-                <div className="h-96 border border-white/20 rounded-lg overflow-hidden">
+              <div className="space-y-4 w-full overflow-hidden">
+                <div className="h-96 border border-white/20 w-full rounded-lg overflow-hidden">
                   <Editor
                     height="100%"
                     defaultLanguage="xml"
@@ -950,6 +950,7 @@ export default function DitherImageApp() {
                       fontSize: 14,
                       lineNumbers: "on",
                       folding: true,
+                      wrapOnEscapedLineFeeds: true,
                       lineDecorationsWidth: 0,
                       lineNumbersMinChars: 3,
                     }}
@@ -958,28 +959,23 @@ export default function DitherImageApp() {
 
                 <div className="flex justify-end space-x-2">
                   <Button
-                    variant="outline"
-                    onClick={() => setShowSvgCodeDialog(false)}
-                    className="border-white/20 text-white hover:bg-white/10"
-                  >
-                    Close
-                  </Button>
-                  <Button
                     onClick={handleCopySVG}
+                    size="sm"
                     className="bg-white text-black hover:bg-gray-100"
                   >
                     {isCopied ? (
-                      <Check className="w-4 h-4 mr-2" />
+                      <Check className="w-4 h-4" />
                     ) : (
-                      <Copy className="w-4 h-4 mr-2" />
+                      <Copy className="w-4 h-4" />
                     )}
-                    {isCopied ? "Copied!" : "Copy SVG Code"}
+                    {isCopied ? "Copied!" : "Copy"}
                   </Button>
                   <Button
                     onClick={handleExportSVG}
+                    size="sm"
                     className="bg-white text-black hover:bg-gray-100"
                   >
-                    <Download className="w-4 h-4 mr-2" />
+                    <Download className="w-4 h-4" />
                     Download as SVG
                   </Button>
                 </div>
