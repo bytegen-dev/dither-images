@@ -1,4 +1,4 @@
-# Image Dithering App
+# Image Dithering v0
 
 <img width="1300" height="1246" alt="image" src="https://github.com/user-attachments/assets/63196c78-2416-4a43-af7b-d2fc59625149" />
 
