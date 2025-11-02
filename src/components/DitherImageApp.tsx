@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import Shuffle from "./Shuffle";
 import {
   Dialog,
@@ -50,6 +51,13 @@ export default function DitherImageApp() {
   const [showSvgCodeDialog, setShowSvgCodeDialog] = useState(false);
   const [svgCode, setSvgCode] = useState("");
   const [isCopied, setIsCopied] = useState(false);
+  const [isInverted, setIsInverted] = useState(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("dither-invert-state");
+      return saved === "true";
+    }
+    return false;
+  });
   const fileInputRef = useRef<HTMLInputElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const cropCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -313,7 +321,12 @@ export default function DitherImageApp() {
 
           for (let y = 0; y < ditherData.length; y++) {
             for (let x = 0; x < ditherData[y].length; x++) {
-              const brightness = ditherData[y][x];
+              let brightness = ditherData[y][x];
+
+              // Invert brightness if invert mode is enabled
+              if (isInverted) {
+                brightness = 1 - brightness;
+              }
 
               // Improved dithering algorithm
               // Use threshold-based dithering for better quality
@@ -403,7 +416,7 @@ export default function DitherImageApp() {
         setIsProcessing(false);
       }
     },
-    [image, gridSize]
+    [image, gridSize, isInverted]
   );
 
   // Debounced dithering function
@@ -436,6 +449,20 @@ export default function DitherImageApp() {
       debouncedGenerateDitheredImage();
     }
   }, [gridSize, debouncedGenerateDitheredImage]);
+
+  // Save invert state to localStorage
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("dither-invert-state", String(isInverted));
+    }
+  }, [isInverted]);
+
+  // Regenerate dither when invert mode changes (immediately, no debounce)
+  useEffect(() => {
+    if (image) {
+      generateDitheredImage();
+    }
+  }, [isInverted, image, generateDitheredImage]);
 
   // Export functions - Direct canvas rendering instead of html2canvas
   const handleExportPNG = useCallback(async () => {
@@ -750,79 +777,91 @@ export default function DitherImageApp() {
 
           {/* Preview Area */}
           {image && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Original Image */}
-              <Card className="p-4 border-border">
-                <h3 className="text-lg font-medium mb-4">Original</h3>
-                <div className="aspect-square bg-muted/10 rounded-lg overflow-hidden">
-                  <img
-                    src={image}
-                    alt="Original"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              </Card>
-
-              {/* Dithered Image */}
-              <Card className="p-4 border-border">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-medium">Dithered</h3>
-                  <div className="flex items-center space-x-2">
-                    {/* Retry Button */}
-                    {image && !isProcessing && (
-                      <Button
-                        onClick={() => {
-                          if (image) {
-                            debouncedGenerateDitheredImage();
-                          }
-                        }}
-                        size="icon"
-                        variant="ghost"
-                        className="text-white hover:bg-white/10 cursor-pointer"
-                      >
-                        <RefreshCcw className="w-4 h-4" />
-                      </Button>
-                    )}
-                    <Button
-                      onClick={handleViewSvgCode}
-                      disabled={isProcessing}
-                      size="sm"
-                      variant="outline"
-                      className="border-white/20 text-white hover:bg-white/10"
-                    >
-                      <Code className="w-4 h-4" />
-                      SVG code
-                    </Button>
-                    <Button
-                      onClick={handleExportPNG}
-                      disabled={isProcessing}
-                      size="sm"
-                      variant="outline"
-                      className="border-white/20 text-white hover:bg-white/10"
-                    >
-                      <Download className="w-4 h-4" /> Download
-                    </Button>
-                  </div>
-                </div>
-                <div className="aspect-square bg-white rounded-lg overflow-hidden relative flex items-center justify-center">
-                  {isProcessing ? (
-                    <div className="flex items-center justify-center h-full">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
-                    </div>
-                  ) : (
-                    <svg
-                      ref={svgRef}
-                      width="400"
-                      height="400"
-                      viewBox="0 0 400 400"
-                      className="dither-svg w-full h-full"
-                      style={{ backgroundColor: "#ffffff" }}
-                      preserveAspectRatio="xMidYMid meet"
+            <>
+              <div className="flex items-center justify-end space-x-2">
+                <Switch
+                  checked={isInverted}
+                  onCheckedChange={setIsInverted}
+                  className="data-[state=checked]:bg-white data-[state=unchecked]:bg-white/50"
+                />
+                <span className="text-sm text-white">Invert</span>
+              </div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Original Image */}
+                <Card className="p-4 border-border">
+                  <h3 className="text-lg font-medium mb-4">Original</h3>
+                  <div className="aspect-square bg-muted/10 rounded-lg overflow-hidden">
+                    <img
+                      src={image}
+                      alt="Original"
+                      className="w-full h-full object-cover"
                     />
-                  )}
-                </div>
-              </Card>
-            </div>
+                  </div>
+                </Card>
+
+                {/* Dithered Image */}
+                <Card className="p-4 border-border">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-medium">Dithered</h3>
+                    <div className="flex items-center space-x-2">
+                      {/* Retry Button */}
+                      {image && !isProcessing && (
+                        <>
+                          <Button
+                            onClick={() => {
+                              if (image) {
+                                debouncedGenerateDitheredImage();
+                              }
+                            }}
+                            size="icon"
+                            variant="ghost"
+                            className="text-white hover:bg-white/10 cursor-pointer"
+                          >
+                            <RefreshCcw className="w-4 h-4" />
+                          </Button>
+                        </>
+                      )}
+                      <Button
+                        onClick={handleViewSvgCode}
+                        disabled={isProcessing}
+                        size="sm"
+                        variant="outline"
+                        className="border-white/20 text-white hover:bg-white/10"
+                      >
+                        <Code className="w-4 h-4" />
+                        SVG code
+                      </Button>
+                      <Button
+                        onClick={handleExportPNG}
+                        disabled={isProcessing}
+                        size="sm"
+                        variant="outline"
+                        className="border-white/20 text-white hover:bg-white/10"
+                      >
+                        <Download className="w-4 h-4" /> Download
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="aspect-square bg-white rounded-lg overflow-hidden relative flex items-center justify-center">
+                    {isProcessing ? (
+                      <div className="flex items-center justify-center h-full">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
+                      </div>
+                    ) : (
+                      <svg
+                        ref={svgRef}
+                        width="400"
+                        height="400"
+                        viewBox="0 0 400 400"
+                        className="dither-svg w-full h-full"
+                        style={{ backgroundColor: "#ffffff" }}
+                        preserveAspectRatio="xMidYMid meet"
+                      />
+                    )}
+                  </div>
+                </Card>
+              </div>
+            </>
           )}
 
           {/* Crop Dialog */}
